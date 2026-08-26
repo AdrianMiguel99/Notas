@@ -48,7 +48,7 @@ function badge(course, grade) {
 
 async function loadGrades() {
   try {
-    const response = await fetch("api/grades", { cache: "no-store" });
+    const response = await fetch("/api/grades", { cache: "no-store" });
     if (!response.ok || !response.headers.get("content-type")?.includes("application/json")) throw new Error();
     return await response.json();
   } catch {
@@ -184,6 +184,14 @@ function showAdminMessage(message, error = false) {
   adminMessage.hidden = !message;
 }
 
+async function readApiJson(response) {
+  const contentType = response.headers.get("content-type") || "";
+  if (!contentType.includes("application/json")) {
+    throw new Error("El servicio administrativo todavía no está disponible en este dominio.");
+  }
+  return response.json();
+}
+
 function setAuthenticated(authenticated) {
   loginPanel.hidden = authenticated;
   gradePanel.hidden = !authenticated;
@@ -191,8 +199,8 @@ function setAuthenticated(authenticated) {
 
 async function checkSession() {
   try {
-    const response = await fetch("api/session", { credentials: "same-origin", cache: "no-store" });
-    const result = await response.json();
+    const response = await fetch("/api/session", { credentials: "same-origin", cache: "no-store" });
+    const result = await readApiJson(response);
     setAuthenticated(Boolean(result.authenticated));
   } catch {
     setAuthenticated(false);
@@ -204,13 +212,13 @@ loginForm.addEventListener("submit", async (event) => {
   showAdminMessage("");
   const fields = new FormData(loginForm);
   try {
-    const response = await fetch("api/login", {
+    const response = await fetch("/api/login", {
       method: "POST",
       credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: fields.get("email"), password: fields.get("password") }),
     });
-    const result = await response.json();
+    const result = await readApiJson(response);
     if (!response.ok) throw new Error(result.error || "No fue posible iniciar sesión.");
     loginForm.reset();
     setAuthenticated(true);
@@ -224,13 +232,13 @@ gradeForm.addEventListener("submit", async (event) => {
   showAdminMessage("");
   const fields = new FormData(gradeForm);
   try {
-    const response = await fetch("api/grades", {
+    const response = await fetch("/api/grades", {
       method: "POST",
       credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ courseId: fields.get("courseId"), typeId: fields.get("typeId"), grade: Number(fields.get("grade")) }),
     });
-    const result = await response.json();
+    const result = await readApiJson(response);
     if (response.status === 401) {
       setAuthenticated(false);
       throw new Error("La sesión venció. Iniciá sesión nuevamente.");
@@ -246,7 +254,7 @@ gradeForm.addEventListener("submit", async (event) => {
 });
 
 document.getElementById("logout-button").addEventListener("click", async () => {
-  await fetch("api/logout", { method: "POST", credentials: "same-origin" }).catch(() => null);
+  await fetch("/api/logout", { method: "POST", credentials: "same-origin" }).catch(() => null);
   setAuthenticated(false);
   showAdminMessage("");
 });
