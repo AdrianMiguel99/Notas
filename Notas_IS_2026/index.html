@@ -6,280 +6,77 @@
   <title>Notas - AdrianMiguel</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
   <div class="container">
     <header>
       <div>
         <h1>Notas del semestre</h1>
-        <div class="small" id="subtitulo"></div>
+        <div class="small" id="subtitulo">Cargando…</div>
       </div>
-
-      <nav>
-        <button class="btn active" data-view="resumen">Resumen</button>
-        <button class="btn" data-view="general">Detalle general</button>
-        <button class="btn" data-view="curso">Ver 1 curso</button>
+      <nav aria-label="Vistas">
+        <button class="btn active" type="button" data-view="resumen">Resumen</button>
+        <button class="btn" type="button" data-view="general">Detalle general</button>
+        <button class="btn" type="button" data-view="curso">Ver 1 curso</button>
+        <button class="btn" type="button" data-view="admin">Admin</button>
       </nav>
     </header>
 
-    <!-- RESUMEN -->
     <section id="view-resumen" class="grid"></section>
 
-    <!-- DETALLE GENERAL -->
     <section id="view-general" style="display:none;">
       <div class="card">
         <h2>Detalle general</h2>
         <div class="table-wrap">
           <table>
-            <thead>
-              <tr>
-                <th>Curso</th>
-                <th>Evaluación</th>
-                <th>Nota</th>
-                <th>Peso %</th>
-                <th>Aporte</th>
-                <th>Fecha</th>
-                <th>Link</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Curso</th><th>Evaluación</th><th>Nota</th><th>Peso %</th><th>Aporte</th><th>Fecha</th></tr></thead>
             <tbody id="tbody-general"></tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- DETALLE POR CURSO -->
     <section id="view-curso" style="display:none;">
       <div class="card">
         <h2>Ver un curso</h2>
-        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px;">
-          <select class="select" id="select-curso"></select>
+        <div class="course-picker">
+          <select class="select" id="select-curso" aria-label="Curso"></select>
           <span class="small">Elegí un curso y te muestro todo su detalle.</span>
         </div>
-
-        <div id="curso-kpis" class="kpis" style="margin-bottom:12px;"></div>
-
+        <div id="curso-kpis" class="kpis course-kpis"></div>
         <div class="table-wrap">
           <table>
-            <thead>
-              <tr>
-                <th>Evaluación</th>
-                <th>Nota</th>
-                <th>Peso %</th>
-                <th>Aporte</th>
-                <th>Fecha</th>
-                <th>Comprobante</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Evaluación</th><th>Nota</th><th>Peso %</th><th>Aporte</th><th>Fecha</th></tr></thead>
             <tbody id="tbody-curso"></tbody>
           </table>
         </div>
       </div>
     </section>
+
+    <section id="view-admin" style="display:none;">
+      <div id="login-panel" class="card admin-card">
+        <h2>Admin</h2>
+        <form id="login-form" class="form-stack">
+          <label>Email<input class="field" name="email" type="email" autocomplete="username" required></label>
+          <label>Contraseña<input class="field" name="password" type="password" autocomplete="current-password" required></label>
+          <div><button class="btn" type="submit">Iniciar sesión</button></div>
+        </form>
+      </div>
+
+      <div id="grade-panel" class="card admin-card" hidden>
+        <div class="admin-heading">
+          <h2>Agregar evaluación</h2>
+          <button id="logout-button" class="btn secondary" type="button">Cerrar sesión</button>
+        </div>
+        <form id="grade-form" class="form-stack">
+          <label>Materia<select class="field" id="admin-course" name="courseId" required></select></label>
+          <label>Tipo<select class="field" id="admin-type" name="typeId" required></select></label>
+          <label>Nota<input class="field" name="grade" type="number" min="0" max="100" step="0.01" inputmode="decimal" required></label>
+          <div><button class="btn" type="submit">Agregar nota</button></div>
+        </form>
+      </div>
+      <p id="admin-message" class="notice" role="status" hidden></p>
+    </section>
   </div>
-
-  <script src="data.js"></script>
-  <script>
-    // ---------- Helpers ----------
-    function fmt(n){
-      if(n === null || n === undefined) return "—";
-      return Number(n).toFixed(2).replace(/\.00$/, "");
-    }
-
-    function badge(nota){
-      if(nota === null || nota === undefined) return `<span class="badge mid">PENDIENTE</span>`;
-      if(nota >= 80) return `<span class="badge ok">MUY BIEN</span>`;
-      if(nota >= 70) return `<span class="badge mid">BIEN</span>`;
-      return `<span class="badge low">ALERTA</span>`;
-    }
-
-    function calcCurso(curso){
-      let acumulado = 0;      // nota * peso /100
-      let pesoHecho = 0;
-
-      for(const ev of curso.evaluaciones){
-        if(ev.nota !== null && ev.nota !== undefined){
-          acumulado += (ev.nota * ev.peso) / 100;
-          pesoHecho += ev.peso;
-        }
-      }
-
-      const proyectada = (pesoHecho > 0) ? (acumulado / (pesoHecho/100)) : 0;
-      return { acumulado, pesoHecho, proyectada };
-    }
-
-    function calcPromedioGeneral(){
-      // promedio simple entre cursos (podrías hacerlo ponderado si querés)
-      let sum = 0;
-      let count = 0;
-      for(const c of cursos){
-        const r = calcCurso(c);
-        if(r.pesoHecho > 0){
-          sum += r.proyectada;
-          count++;
-        }
-      }
-      return count ? (sum / count) : 0;
-    }
-
-    // ---------- Render ----------
-    const subtitulo = document.getElementById("subtitulo");
-    const viewResumen = document.getElementById("view-resumen");
-    const viewGeneral = document.getElementById("view-general");
-    const viewCurso = document.getElementById("view-curso");
-
-    const tbodyGeneral = document.getElementById("tbody-general");
-    const selectCurso = document.getElementById("select-curso");
-    const tbodyCurso = document.getElementById("tbody-curso");
-    const cursoKpis = document.getElementById("curso-kpis");
-
-    function renderResumen(){
-      viewResumen.innerHTML = "";
-
-      const promedio = calcPromedioGeneral();
-
-      const cardGeneral = document.createElement("div");
-      cardGeneral.className = "card";
-      cardGeneral.innerHTML = `
-        <h2>Resumen general</h2>
-        <div class="kpis">
-          <div class="kpi">
-            <div class="label">Promedio actual (proyectado)</div>
-            <div class="value">${fmt(promedio)}</div>
-          </div>
-          <div class="kpi">
-            <div class="label">Semestre</div>
-            <div class="value">${SEMESTRE}</div>
-          </div>
-        </div>
-        <div class="small" style="margin-top:10px;">
-          “Proyectado” significa: cómo vas según lo evaluado hasta ahora.
-        </div>
-      `;
-      viewResumen.appendChild(cardGeneral);
-
-      for(const c of cursos){
-        const r = calcCurso(c);
-        const card = document.createElement("div");
-        card.className = "card";
-
-        card.innerHTML = `
-          <h2>${c.nombre}</h2>
-          <div class="kpis">
-            <div class="kpi">
-              <div class="label">Nota acumulada</div>
-              <div class="value">${fmt(r.acumulado)}</div>
-            </div>
-            <div class="kpi">
-              <div class="label">% completado</div>
-              <div class="value">${fmt(r.pesoHecho)}%</div>
-            </div>
-            <div class="kpi">
-              <div class="label">Nota proyectada</div>
-              <div class="value">${fmt(r.proyectada)}</div>
-            </div>
-          </div>
-          <div class="small" style="margin-top:10px;">
-            ${badge(r.proyectada)}
-          </div>
-        `;
-        viewResumen.appendChild(card);
-      }
-    }
-
-    function renderGeneral(){
-      tbodyGeneral.innerHTML = "";
-      for(const c of cursos){
-        for(const ev of c.evaluaciones){
-          const aporte = (ev.nota == null) ? "—" : fmt((ev.nota * ev.peso)/100);
-          const link = ev.link ? `<a href="${ev.link}" target="_blank" rel="noopener">Ver</a>` : "—";
-
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${c.nombre}</td>
-            <td>${ev.nombre}</td>
-            <td>${ev.nota == null ? "—" : ev.nota}</td>
-            <td>${ev.peso}</td>
-            <td>${aporte}</td>
-            <td>${ev.fecha || "—"}</td>
-            <td>${link}</td>
-          `;
-          tbodyGeneral.appendChild(tr);
-        }
-      }
-    }
-
-    function fillSelect(){
-      selectCurso.innerHTML = "";
-      for(const c of cursos){
-        const opt = document.createElement("option");
-        opt.value = c.id;
-        opt.textContent = c.nombre;
-        selectCurso.appendChild(opt);
-      }
-    }
-
-    function renderCurso(id){
-      const c = cursos.find(x => x.id === id) || cursos[0];
-      const r = calcCurso(c);
-
-      cursoKpis.innerHTML = `
-        <div class="kpi">
-          <div class="label">Nota acumulada</div>
-          <div class="value">${fmt(r.acumulado)}</div>
-        </div>
-        <div class="kpi">
-          <div class="label">% completado</div>
-          <div class="value">${fmt(r.pesoHecho)}%</div>
-        </div>
-        <div class="kpi">
-          <div class="label">Nota proyectada</div>
-          <div class="value">${fmt(r.proyectada)}</div>
-        </div>
-      `;
-
-      tbodyCurso.innerHTML = "";
-      for(const ev of c.evaluaciones){
-        const aporte = (ev.nota == null) ? "—" : fmt((ev.nota * ev.peso)/100);
-        const link = ev.link ? `<a href="${ev.link}" target="_blank" rel="noopener">Ver</a>` : "—";
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${ev.nombre}</td>
-          <td>${ev.nota == null ? "—" : ev.nota}</td>
-          <td>${ev.peso}</td>
-          <td>${aporte}</td>
-          <td>${ev.fecha || "—"}</td>
-          <td>${link}</td>
-        `;
-        tbodyCurso.appendChild(tr);
-      }
-    }
-
-    // ---------- Menu ----------
-    function setView(view){
-      document.querySelectorAll(".btn").forEach(b => b.classList.remove("active"));
-      document.querySelector(`.btn[data-view="${view}"]`).classList.add("active");
-
-      viewResumen.style.display = (view === "resumen") ? "grid" : "none";
-      viewGeneral.style.display = (view === "general") ? "block" : "none";
-      viewCurso.style.display = (view === "curso") ? "block" : "none";
-
-      if(view === "general") renderGeneral();
-      if(view === "curso") renderCurso(selectCurso.value);
-    }
-
-    // ---------- Init ----------
-    subtitulo.textContent = `${SEMESTRE} • Actualizado manualmente`;
-
-    renderResumen();
-    fillSelect();
-
-    document.querySelectorAll(".btn").forEach(btn => {
-      btn.addEventListener("click", () => setView(btn.dataset.view));
-    });
-
-    selectCurso.addEventListener("change", () => renderCurso(selectCurso.value));
-  </script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>

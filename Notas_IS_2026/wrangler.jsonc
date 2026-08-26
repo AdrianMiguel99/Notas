@@ -1,0 +1,10 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "notas-is-2026",
+  "main": "./worker/index.js",
+  "compatibility_date": "2026-08-26",
+  "assets": {
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  }
+}
