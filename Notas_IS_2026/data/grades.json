@@ -1,78 +1,315 @@
 {
   "semester": "IIS-2026",
-  "gradeScale": { "min": 0, "max": 100 },
+  "gradeScale": {
+    "min": 0,
+    "max": 100
+  },
   "courses": [
     {
       "id": "CI-0129",
       "name": "CI-0129 - Inteligencia Artificial",
       "assessmentTypes": [
-        { "id": "project-proposal", "label": "Propuesta del proyecto", "entryLabel": "Propuesta del proyecto", "weight": 5, "maxEntries": 1 },
-        { "id": "project-development", "label": "Desarrollo del proyecto", "entryLabel": "Desarrollo del proyecto", "weight": 5, "maxEntries": 1 },
-        { "id": "project-demo", "label": "Presentación / demo", "entryLabel": "Presentación / demo", "weight": 5, "maxEntries": 1 },
-        { "id": "article-draft", "label": "Artículo - borrador", "entryLabel": "Artículo - borrador", "weight": 2, "maxEntries": 1 },
-        { "id": "article-final", "label": "Artículo - versión final", "entryLabel": "Artículo - versión final", "weight": 8, "maxEntries": 1 },
-        { "id": "critical-analysis", "label": "Análisis críticos de presentaciones", "entryLabel": "Análisis crítico", "weight": 5 },
-        { "id": "labs-tasks", "label": "Laboratorios + tareas prácticas asociadas", "entryLabel": "Laboratorio / tarea práctica", "weight": 16 },
-        { "id": "class-work", "label": "Trabajos en clase / verificación", "entryLabel": "Trabajo en clase", "weight": 4 },
-        { "id": "quiz", "label": "Quiz individual", "entryLabel": "Quiz", "weight": 20 },
-        { "id": "final-exam", "label": "Examen final individual", "entryLabel": "Examen final individual", "weight": 30, "maxEntries": 1 }
+        {
+          "id": "project-proposal",
+          "label": "Propuesta del proyecto",
+          "entryLabel": "Propuesta del proyecto",
+          "weight": 5,
+          "maxEntries": 1
+        },
+        {
+          "id": "project-development",
+          "label": "Desarrollo del proyecto",
+          "entryLabel": "Desarrollo del proyecto",
+          "weight": 5,
+          "maxEntries": 1
+        },
+        {
+          "id": "project-demo",
+          "label": "Presentación / demo",
+          "entryLabel": "Presentación / demo",
+          "weight": 5,
+          "maxEntries": 1
+        },
+        {
+          "id": "article-draft",
+          "label": "Artículo - borrador",
+          "entryLabel": "Artículo - borrador",
+          "weight": 2,
+          "maxEntries": 1
+        },
+        {
+          "id": "article-final",
+          "label": "Artículo - versión final",
+          "entryLabel": "Artículo - versión final",
+          "weight": 8,
+          "maxEntries": 1
+        },
+        {
+          "id": "critical-analysis",
+          "label": "Análisis críticos de presentaciones",
+          "entryLabel": "Análisis crítico",
+          "weight": 5
+        },
+        {
+          "id": "labs-tasks",
+          "label": "Laboratorios + tareas prácticas asociadas",
+          "entryLabel": "Laboratorio / tarea práctica",
+          "weight": 16
+        },
+        {
+          "id": "class-work",
+          "label": "Trabajos en clase / verificación",
+          "entryLabel": "Trabajo en clase",
+          "weight": 4
+        },
+        {
+          "id": "quiz",
+          "label": "Quiz individual",
+          "entryLabel": "Quiz",
+          "weight": 20
+        },
+        {
+          "id": "final-exam",
+          "label": "Examen final individual",
+          "entryLabel": "Examen final individual",
+          "weight": 30,
+          "maxEntries": 1
+        }
       ]
     },
     {
       "id": "CI-0143",
       "name": "CI-0143 - Seguridad de Sistemas Computacionales",
-      "thresholds": { "pass": 67.5, "extension": 57.5 },
+      "thresholds": {
+        "pass": 67.5,
+        "extension": 57.5
+      },
       "assessmentTypes": [
-        { "id": "short-collaborative", "label": "Presentaciones / tareas cortas / trabajos colaborativos / investigaciones", "entryLabel": "Actividad corta", "weight": 15 },
-        { "id": "programmed-applied", "label": "Tareas programadas / proyectos aplicados", "entryLabel": "Tarea programada / proyecto", "weight": 40 },
-        { "id": "short-evaluation", "label": "Evaluaciones cortas", "entryLabel": "Evaluación corta", "weight": 25 },
-        { "id": "final-evaluation", "label": "Evaluación final", "entryLabel": "Evaluación final", "weight": 20, "maxEntries": 1 }
+        {
+          "id": "short-collaborative",
+          "label": "Presentaciones / tareas cortas / trabajos colaborativos / investigaciones",
+          "entryLabel": "Actividad corta",
+          "weight": 15
+        },
+        {
+          "id": "programmed-applied",
+          "label": "Tareas programadas / proyectos aplicados",
+          "entryLabel": "Tarea programada / proyecto",
+          "weight": 40
+        },
+        {
+          "id": "short-evaluation",
+          "label": "Evaluaciones cortas",
+          "entryLabel": "Evaluación corta",
+          "weight": 25
+        },
+        {
+          "id": "final-evaluation",
+          "label": "Evaluación final",
+          "entryLabel": "Evaluación final",
+          "weight": 20,
+          "maxEntries": 1
+        }
       ]
     },
     {
       "id": "CI-0131",
       "name": "CI-0131 - Diseño de Experimentos",
-      "thresholds": { "pass": 67.5, "extension": 57.5 },
+      "thresholds": {
+        "pass": 67.5,
+        "extension": 57.5
+      },
       "assessmentTypes": [
-        { "id": "class-work", "label": "Trabajos en clase", "entryLabel": "Trabajo en clase", "weight": 15 },
-        { "id": "extra-class-work", "label": "Trabajos extra-clase", "entryLabel": "Trabajo extra-clase", "weight": 15 },
-        { "id": "collaborative-participation", "label": "Asistencia y participación (aprendizaje colaborativo)", "entryLabel": "Asistencia y participación", "weight": 10, "maxEntries": 1 },
-        { "id": "feedback-development", "label": "Realización / propuesta y desarrollo", "entryLabel": "Realización / propuesta y desarrollo", "weight": 5, "maxEntries": 1 },
-        { "id": "feedback-participation", "label": "Asistencia y participación (retroalimentación)", "entryLabel": "Asistencia y participación - retroalimentación", "weight": 5, "maxEntries": 1 },
-        { "id": "proposal-presentation", "label": "Propuesta - presentación", "entryLabel": "Propuesta - presentación", "weight": 5, "maxEntries": 1 },
-        { "id": "proposal-document", "label": "Propuesta - documento", "entryLabel": "Propuesta - documento", "weight": 5, "maxEntries": 1 },
-        { "id": "progress-presentation", "label": "Avance - presentación", "entryLabel": "Avance - presentación", "weight": 10, "maxEntries": 1 },
-        { "id": "progress-document", "label": "Avance - documento", "entryLabel": "Avance - documento", "weight": 10, "maxEntries": 1 },
-        { "id": "final-presentation", "label": "Entrega final - presentación", "entryLabel": "Entrega final - presentación", "weight": 10, "maxEntries": 1 },
-        { "id": "final-document", "label": "Entrega final - documento", "entryLabel": "Entrega final - documento", "weight": 10, "maxEntries": 1 }
+        {
+          "id": "class-work",
+          "label": "Trabajos en clase",
+          "entryLabel": "Trabajo en clase",
+          "weight": 15
+        },
+        {
+          "id": "extra-class-work",
+          "label": "Trabajos extra-clase",
+          "entryLabel": "Trabajo extra-clase",
+          "weight": 15
+        },
+        {
+          "id": "collaborative-participation",
+          "label": "Asistencia y participación (aprendizaje colaborativo)",
+          "entryLabel": "Asistencia y participación",
+          "weight": 10,
+          "maxEntries": 1
+        },
+        {
+          "id": "feedback-development",
+          "label": "Realización / propuesta y desarrollo",
+          "entryLabel": "Realización / propuesta y desarrollo",
+          "weight": 5,
+          "maxEntries": 1
+        },
+        {
+          "id": "feedback-participation",
+          "label": "Asistencia y participación (retroalimentación)",
+          "entryLabel": "Asistencia y participación - retroalimentación",
+          "weight": 5,
+          "maxEntries": 1
+        },
+        {
+          "id": "proposal-presentation",
+          "label": "Propuesta - presentación",
+          "entryLabel": "Propuesta - presentación",
+          "weight": 5,
+          "maxEntries": 1
+        },
+        {
+          "id": "proposal-document",
+          "label": "Propuesta - documento",
+          "entryLabel": "Propuesta - documento",
+          "weight": 5,
+          "maxEntries": 1
+        },
+        {
+          "id": "progress-presentation",
+          "label": "Avance - presentación",
+          "entryLabel": "Avance - presentación",
+          "weight": 10,
+          "maxEntries": 1
+        },
+        {
+          "id": "progress-document",
+          "label": "Avance - documento",
+          "entryLabel": "Avance - documento",
+          "weight": 10,
+          "maxEntries": 1
+        },
+        {
+          "id": "final-presentation",
+          "label": "Entrega final - presentación",
+          "entryLabel": "Entrega final - presentación",
+          "weight": 10,
+          "maxEntries": 1
+        },
+        {
+          "id": "final-document",
+          "label": "Entrega final - documento",
+          "entryLabel": "Entrega final - documento",
+          "weight": 10,
+          "maxEntries": 1
+        }
       ]
     },
     {
       "id": "MA-1005",
       "name": "MA-1005 - Ecuaciones Diferenciales",
       "assessmentTypes": [
-        { "id": "midterm-1", "label": "Parcial 1", "entryLabel": "Parcial 1", "weight": 20, "maxEntries": 1 },
-        { "id": "midterm-2", "label": "Parcial 2", "entryLabel": "Parcial 2", "weight": 20, "maxEntries": 1 },
-        { "id": "midterm-3", "label": "Parcial 3", "entryLabel": "Parcial 3", "weight": 20, "maxEntries": 1 },
-        { "id": "midterm-4", "label": "Parcial 4", "entryLabel": "Parcial 4", "weight": 20, "maxEntries": 1 },
-        { "id": "short-test-1", "label": "Prueba corta 1", "entryLabel": "Prueba corta 1", "weight": 4, "maxEntries": 1 },
-        { "id": "short-test-2", "label": "Prueba corta 2", "entryLabel": "Prueba corta 2", "weight": 4, "maxEntries": 1 },
-        { "id": "short-test-3", "label": "Prueba corta 3", "entryLabel": "Prueba corta 3", "weight": 4, "maxEntries": 1 },
-        { "id": "short-test-4", "label": "Prueba corta 4", "entryLabel": "Prueba corta 4", "weight": 4, "maxEntries": 1 },
-        { "id": "homework", "label": "Tarea", "entryLabel": "Tarea", "weight": 4, "maxEntries": 1 }
+        {
+          "id": "midterm-1",
+          "label": "Parcial 1",
+          "entryLabel": "Parcial 1",
+          "weight": 20,
+          "maxEntries": 1
+        },
+        {
+          "id": "midterm-2",
+          "label": "Parcial 2",
+          "entryLabel": "Parcial 2",
+          "weight": 20,
+          "maxEntries": 1
+        },
+        {
+          "id": "midterm-3",
+          "label": "Parcial 3",
+          "entryLabel": "Parcial 3",
+          "weight": 20,
+          "maxEntries": 1
+        },
+        {
+          "id": "midterm-4",
+          "label": "Parcial 4",
+          "entryLabel": "Parcial 4",
+          "weight": 20,
+          "maxEntries": 1
+        },
+        {
+          "id": "short-test-1",
+          "label": "Prueba corta 1",
+          "entryLabel": "Prueba corta 1",
+          "weight": 4,
+          "maxEntries": 1
+        },
+        {
+          "id": "short-test-2",
+          "label": "Prueba corta 2",
+          "entryLabel": "Prueba corta 2",
+          "weight": 4,
+          "maxEntries": 1
+        },
+        {
+          "id": "short-test-3",
+          "label": "Prueba corta 3",
+          "entryLabel": "Prueba corta 3",
+          "weight": 4,
+          "maxEntries": 1
+        },
+        {
+          "id": "short-test-4",
+          "label": "Prueba corta 4",
+          "entryLabel": "Prueba corta 4",
+          "weight": 4,
+          "maxEntries": 1
+        },
+        {
+          "id": "homework",
+          "label": "Tarea",
+          "entryLabel": "Tarea",
+          "weight": 4,
+          "maxEntries": 1
+        }
       ]
     },
     {
       "id": "CI-0120",
       "name": "CI-0120 - Arquitectura de Computadoras",
-      "thresholds": { "pass": 67.5, "extension": 57.5 },
+      "thresholds": {
+        "pass": 67.5,
+        "extension": 57.5
+      },
       "assessmentTypes": [
-        { "id": "short-test", "label": "Prueba corta", "entryLabel": "Prueba corta", "weight": 20 },
-        { "id": "homework", "label": "Tarea", "entryLabel": "Tarea", "weight": 30 },
-        { "id": "class-work", "label": "Trabajo en clase", "entryLabel": "Trabajo en clase", "weight": 10 },
-        { "id": "project", "label": "Proyecto", "entryLabel": "Proyecto", "weight": 40, "maxEntries": 1 }
+        {
+          "id": "short-test",
+          "label": "Prueba corta",
+          "entryLabel": "Prueba corta",
+          "weight": 20
+        },
+        {
+          "id": "homework",
+          "label": "Tarea",
+          "entryLabel": "Tarea",
+          "weight": 30
+        },
+        {
+          "id": "class-work",
+          "label": "Trabajo en clase",
+          "entryLabel": "Trabajo en clase",
+          "weight": 10
+        },
+        {
+          "id": "project",
+          "label": "Proyecto",
+          "entryLabel": "Proyecto",
+          "weight": 40,
+          "maxEntries": 1
+        }
       ]
     }
   ],
-  "evaluations": []
+  "evaluations": [
+    {
+      "id": "850279d4-ad83-4a7a-855e-595cad0cb2b5",
+      "courseId": "CI-0129",
+      "typeId": "labs-tasks",
+      "name": "Laboratorio / tarea práctica 1",
+      "grade": 40,
+      "createdAt": "2026-08-27T01:03:42.228Z"
+    }
+  ]
 }
