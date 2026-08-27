@@ -192,8 +192,9 @@ async function addGrade(request, env) {
     let current;
     try {
       current = await readRepositoryData(env);
-    } catch {
-      return json({ error: "No fue posible leer las notas guardadas." }, 502);
+    } catch (error) {
+      const unauthorized = error instanceof Error && /\((401|403)\)/.test(error.message);
+      return json({ error: unauthorized ? "El token de GitHub no es válido o no tiene permiso para este repositorio." : "No fue posible leer las notas guardadas." }, 503);
     }
     const course = current.data.courses.find((candidate) => candidate.id === body.courseId);
     const type = course?.assessmentTypes.find((candidate) => candidate.id === body.typeId);
@@ -224,37 +225,15 @@ async function addGrade(request, env) {
       return json({ error: "No fue posible guardar la nota." }, 502);
     }
     if (response.ok) return json({ evaluation, data: current.data }, 201);
-    if (response.status !== 409 || attempt === 1) return json({ error: "No fue posible guardar la nota." }, 502);
+    if (response.status === 401 || response.status === 403) return json({ error: "El token de GitHub no es válido o no tiene permiso de escritura." }, 503);
+    if (response.status !== 409 || attempt === 1) return json({ error: "No fue posible guardar la nota." }, 503);
   }
-  return json({ error: "No fue posible guardar la nota." }, 502);
+  return json({ error: "No fue posible guardar la nota." }, 503);
 }
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    if (url.pathname === "/api/config-check" && request.method === "GET") {
-      const config = repositoryConfig(env);
-      let apiHost = "invalid";
-      try {
-        apiHost = new URL(config.api).host;
-      } catch {}
-      return json({
-        apiHost,
-        owner: config.owner,
-        repo: config.repo,
-        branch: config.branch,
-        path: config.path,
-        tokenConfigured: Boolean(env.GITHUB_TOKEN),
-      });
-    }
-    if (url.pathname === "/api/github-check" && request.method === "GET") {
-      try {
-        const response = await fetch(`${contentsUrl(env)}?ref=${encodeURIComponent(repositoryConfig(env).branch)}`, { headers: githubHeaders(env) });
-        return json({ upstreamStatus: response.status, upstreamType: response.headers.get("Content-Type") });
-      } catch (error) {
-        return json({ fetchError: error instanceof Error ? error.message : "Error desconocido" });
-      }
-    }
     if (url.pathname === "/api/login" && request.method === "POST") return login(request, env);
     if (url.pathname === "/api/logout" && request.method === "POST") {
       if (!sameOrigin(request)) return json({ error: "Solicitud no permitida." }, 403);
@@ -265,8 +244,9 @@ export default {
       try {
         const current = await readRepositoryData(env);
         return json(current.data);
-      } catch {
-        return json({ error: "No fue posible cargar las notas." }, 502);
+      } catch (error) {
+        const unauthorized = error instanceof Error && /\((401|403)\)/.test(error.message);
+        return json({ error: unauthorized ? "El token de GitHub no es válido o no tiene acceso al repositorio." : "No fue posible cargar las notas." }, 503);
       }
     }
     if (url.pathname === "/api/grades" && request.method === "POST") return addGrade(request, env);
