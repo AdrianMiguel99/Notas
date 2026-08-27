@@ -6,8 +6,14 @@ import worker from "../worker/index.js";
 
 const sourceData = JSON.parse(await readFile(new URL("../data/grades.json", import.meta.url), "utf8"));
 
-test("los rubros repetibles usan el promedio y no multiplican su peso", () => {
+function emptyData() {
   const data = structuredClone(sourceData);
+  data.evaluations = [];
+  return data;
+}
+
+test("los rubros repetibles usan el promedio y no multiplican su peso", () => {
+  const data = emptyData();
   data.evaluations.push(
     { id: "1", courseId: "CI-0120", typeId: "homework", name: "Tarea 1", grade: 80, createdAt: "2026-08-01T00:00:00.000Z" },
     { id: "2", courseId: "CI-0120", typeId: "homework", name: "Tarea 2", grade: 90, createdAt: "2026-08-02T00:00:00.000Z" },
@@ -22,15 +28,15 @@ test("los rubros repetibles usan el promedio y no multiplican su peso", () => {
 });
 
 test("cero cuenta como nota y una evaluación inexistente no cuenta", () => {
-  const data = structuredClone(sourceData);
+  const data = emptyData();
   data.evaluations.push({ id: "1", courseId: "MA-1005", typeId: "midterm-1", name: "Parcial 1", grade: 0, createdAt: "2026-08-01T00:00:00.000Z" });
   const course = data.courses.find((candidate) => candidate.id === "MA-1005");
   assert.deepEqual(calculateCourse(data, course), { accumulated: 0, completedWeight: 20, projected: 0 });
 });
 
-test("login, rechazo de credenciales y alta persistente de una nota", async () => {
+test("login, rechazo de credenciales y alta, edición y eliminación persistentes", async () => {
   const originalFetch = globalThis.fetch;
-  let storedData = structuredClone(sourceData);
+  let storedData = emptyData();
   let sha = "sha-1";
   globalThis.fetch = async (_url, options = {}) => {
     if ((options.method || "GET") === "PUT") {
@@ -81,12 +87,32 @@ test("login, rechazo de credenciales y alta persistente de una nota", async () =
     assert.equal(result.evaluation.name, "Prueba corta 1");
     assert.equal(storedData.evaluations.length, 1);
     assert.equal(storedData.evaluations[0].grade, 85);
-
     const architecture = storedData.courses.find((candidate) => candidate.id === "CI-0120");
     assert.deepEqual(calculateCourse(storedData, architecture), { accumulated: 17, completedWeight: 20, projected: 85 });
     assert.equal(calculateOverall(storedData), 85);
     const artificialIntelligence = storedData.courses.find((candidate) => candidate.id === "CI-0129");
     assert.deepEqual(calculateCourse(storedData, artificialIntelligence), { accumulated: 0, completedWeight: 0, projected: 0 });
+
+    const edited = await worker.fetch(new Request(`${origin}/api/grades/${result.evaluation.id}`, {
+      method: "PATCH",
+      headers: { Origin: origin, Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ grade: 91 }),
+    }), env);
+    assert.equal(edited.status, 200);
+    assert.equal(storedData.evaluations[0].grade, 91);
+    const editedCourse = calculateCourse(storedData, architecture);
+    assert.equal(editedCourse.accumulated, 18.2);
+    assert.equal(editedCourse.completedWeight, 20);
+    assert.ok(Math.abs(editedCourse.projected - 91) < 1e-9);
+    assert.ok(Math.abs(calculateOverall(storedData) - 91) < 1e-9);
+
+    const removed = await worker.fetch(new Request(`${origin}/api/grades/${result.evaluation.id}`, {
+      method: "DELETE",
+      headers: { Origin: origin, Cookie: cookie },
+    }), env);
+    assert.equal(removed.status, 200);
+    assert.equal(storedData.evaluations.length, 0);
+    assert.deepEqual(calculateCourse(storedData, architecture), { accumulated: 0, completedWeight: 0, projected: 0 });
   } finally {
     globalThis.fetch = originalFetch;
   }

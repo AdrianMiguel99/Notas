@@ -231,6 +231,60 @@ async function addGrade(request, env) {
   return json({ error: "No fue posible guardar la nota." }, 503);
 }
 
+async function changeGrade(request, env, evaluationId) {
+  if (!sameOrigin(request)) return json({ error: "Solicitud no permitida." }, 403);
+  if (!(await validSession(request, env))) return json({ error: "No autorizado." }, 401);
+  if (!env.GITHUB_TOKEN) return json({ error: "La persistencia no está configurada." }, 503);
+
+  let body = null;
+  if (request.method === "PATCH") {
+    try {
+      body = await parseJson(request);
+    } catch (error) {
+      return json({ error: error.message }, 400);
+    }
+  }
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    let current;
+    try {
+      current = await readRepositoryData(env);
+    } catch (error) {
+      const unauthorized = error instanceof Error && /\((401|403)\)/.test(error.message);
+      return json({ error: unauthorized ? "El token de GitHub no es válido o no tiene permiso para este repositorio." : "No fue posible leer las notas guardadas." }, 503);
+    }
+
+    const index = current.data.evaluations.findIndex((evaluation) => evaluation.id === evaluationId);
+    if (index < 0) return json({ error: "La evaluación ya no existe." }, 404);
+    const evaluation = current.data.evaluations[index];
+
+    if (request.method === "PATCH") {
+      const grade = body.grade;
+      const min = Number(current.data.gradeScale?.min ?? 0);
+      const max = Number(current.data.gradeScale?.max ?? 100);
+      if (typeof grade !== "number" || !Number.isFinite(grade) || grade < min || grade > max) {
+        return json({ error: `La nota debe estar entre ${min} y ${max}.` }, 400);
+      }
+      evaluation.grade = grade;
+      evaluation.updatedAt = new Date().toISOString();
+    } else {
+      current.data.evaluations.splice(index, 1);
+    }
+
+    let response;
+    try {
+      const action = request.method === "PATCH" ? "edit" : "delete";
+      response = await writeRepositoryData(env, current.data, current.sha, `chore: ${action} ${evaluation.name} grade for ${evaluation.courseId}`);
+    } catch {
+      return json({ error: "No fue posible guardar el cambio." }, 503);
+    }
+    if (response.ok) return json({ evaluation, data: current.data });
+    if (response.status === 401 || response.status === 403) return json({ error: "El token de GitHub no es válido o no tiene permiso de escritura." }, 503);
+    if (response.status !== 409 || attempt === 1) return json({ error: "No fue posible guardar el cambio." }, 503);
+  }
+  return json({ error: "No fue posible guardar el cambio." }, 503);
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -250,6 +304,10 @@ export default {
       }
     }
     if (url.pathname === "/api/grades" && request.method === "POST") return addGrade(request, env);
+    const evaluationMatch = url.pathname.match(/^\/api\/grades\/([^/]+)$/);
+    if (evaluationMatch && (request.method === "PATCH" || request.method === "DELETE")) {
+      return changeGrade(request, env, decodeURIComponent(evaluationMatch[1]));
+    }
     if (url.pathname.startsWith("/api/")) return json({ error: "Ruta no encontrada." }, 404);
     if (env.ASSETS) return env.ASSETS.fetch(request);
     return new Response(null, { status: 404 });

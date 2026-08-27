@@ -19,6 +19,7 @@ const gradePanel = document.getElementById("grade-panel");
 const adminMessage = document.getElementById("admin-message");
 const adminCourse = document.getElementById("admin-course");
 const adminType = document.getElementById("admin-type");
+const adminEvaluationList = document.getElementById("admin-evaluation-list");
 
 function fmt(value) {
   if (value === null || value === undefined) return "—";
@@ -162,12 +163,63 @@ function renderCourse(id) {
   }
 }
 
+function renderAdminEvaluations() {
+  adminEvaluationList.innerHTML = "";
+  const entries = gradeData.courses.flatMap((course) =>
+    evaluationsFor(gradeData, course.id).map((evaluation) => ({ course, evaluation }))
+  ).reverse();
+
+  if (!entries.length) {
+    const empty = document.createElement("p");
+    empty.className = "small empty";
+    empty.textContent = "Todavía no hay evaluaciones registradas.";
+    adminEvaluationList.appendChild(empty);
+    return;
+  }
+
+  for (const { course, evaluation } of entries) {
+    const row = document.createElement("div");
+    row.className = "admin-evaluation-row";
+
+    const info = document.createElement("div");
+    info.className = "admin-evaluation-info";
+    const name = document.createElement("strong");
+    name.textContent = evaluation.name;
+    const courseName = document.createElement("span");
+    courseName.className = "small";
+    courseName.textContent = course.name;
+    info.append(name, courseName);
+
+    const actions = document.createElement("div");
+    actions.className = "admin-evaluation-actions";
+    const grade = document.createElement("span");
+    grade.className = "admin-evaluation-grade";
+    grade.textContent = fmt(evaluation.grade);
+    const edit = document.createElement("button");
+    edit.className = "btn compact secondary";
+    edit.type = "button";
+    edit.dataset.action = "edit";
+    edit.dataset.id = evaluation.id;
+    edit.textContent = "Editar";
+    const remove = document.createElement("button");
+    remove.className = "btn compact secondary danger";
+    remove.type = "button";
+    remove.dataset.action = "delete";
+    remove.dataset.id = evaluation.id;
+    remove.textContent = "Eliminar";
+    actions.append(grade, edit, remove);
+    row.append(info, actions);
+    adminEvaluationList.appendChild(row);
+  }
+}
+
 function renderAll() {
   subtitulo.textContent = `${gradeData.semester} • Actualizado automáticamente`;
   renderResumen();
   renderGeneral();
   renderCourse(selectCurso.value || gradeData.courses[0].id);
   fillTypeSelect();
+  renderAdminEvaluations();
 }
 
 function setView(view) {
@@ -250,6 +302,56 @@ gradeForm.addEventListener("submit", async (event) => {
     showAdminMessage("Nota agregada correctamente.");
   } catch (error) {
     showAdminMessage(error.message || "No fue posible agregar la nota.", true);
+  }
+});
+
+adminEvaluationList.addEventListener("click", async (event) => {
+  const button = event.target.closest("button[data-action]");
+  if (!button) return;
+  const evaluation = gradeData.evaluations.find((candidate) => candidate.id === button.dataset.id);
+  if (!evaluation) return;
+
+  let method;
+  let body;
+  let successMessage;
+  if (button.dataset.action === "edit") {
+    const value = window.prompt(`Nueva nota para ${evaluation.name}:`, fmt(evaluation.grade));
+    if (value === null) return;
+    const grade = Number(value.replace(",", "."));
+    if (!Number.isFinite(grade) || grade < gradeData.gradeScale.min || grade > gradeData.gradeScale.max) {
+      showAdminMessage(`La nota debe estar entre ${gradeData.gradeScale.min} y ${gradeData.gradeScale.max}.`, true);
+      return;
+    }
+    method = "PATCH";
+    body = JSON.stringify({ grade });
+    successMessage = "Nota editada correctamente.";
+  } else {
+    if (!window.confirm(`¿Eliminar ${evaluation.name}?`)) return;
+    method = "DELETE";
+    successMessage = "Nota eliminada correctamente.";
+  }
+
+  button.disabled = true;
+  showAdminMessage("");
+  try {
+    const response = await fetch(`/api/grades/${encodeURIComponent(evaluation.id)}`, {
+      method,
+      credentials: "same-origin",
+      headers: body ? { "Content-Type": "application/json" } : undefined,
+      body,
+    });
+    const result = await readApiJson(response);
+    if (response.status === 401) {
+      setAuthenticated(false);
+      throw new Error("La sesión venció. Iniciá sesión nuevamente.");
+    }
+    if (!response.ok) throw new Error(result.error || "No fue posible modificar la nota.");
+    gradeData = result.data;
+    renderAll();
+    showAdminMessage(successMessage);
+  } catch (error) {
+    button.disabled = false;
+    showAdminMessage(error.message || "No fue posible modificar la nota.", true);
   }
 });
 
