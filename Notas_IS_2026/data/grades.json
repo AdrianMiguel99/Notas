@@ -310,6 +310,14 @@
       "name": "Laboratorio / tarea práctica 1",
       "grade": 40,
       "createdAt": "2026-08-27T01:03:42.228Z"
+    },
+    {
+      "id": "818fdf62-0070-496c-a5db-c02972ba00fd",
+      "courseId": "CI-0129",
+      "typeId": "labs-tasks",
+      "name": "Laboratorio / tarea práctica 2",
+      "grade": 100,
+      "createdAt": "2026-08-27T01:19:44.874Z"
     }
   ]
 }
