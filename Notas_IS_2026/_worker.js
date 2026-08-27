@@ -232,6 +232,21 @@ async function addGrade(request, env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname === "/api/config-check" && request.method === "GET") {
+      const config = repositoryConfig(env);
+      let apiHost = "invalid";
+      try {
+        apiHost = new URL(config.api).host;
+      } catch {}
+      return json({
+        apiHost,
+        owner: config.owner,
+        repo: config.repo,
+        branch: config.branch,
+        path: config.path,
+        tokenConfigured: Boolean(env.GITHUB_TOKEN),
+      });
+    }
     if (url.pathname === "/api/login" && request.method === "POST") return login(request, env);
     if (url.pathname === "/api/logout" && request.method === "POST") {
       if (!sameOrigin(request)) return json({ error: "Solicitud no permitida." }, 403);
