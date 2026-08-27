@@ -247,6 +247,14 @@ export default {
         tokenConfigured: Boolean(env.GITHUB_TOKEN),
       });
     }
+    if (url.pathname === "/api/github-check" && request.method === "GET") {
+      try {
+        const response = await fetch(`${contentsUrl(env)}?ref=${encodeURIComponent(repositoryConfig(env).branch)}`, { headers: githubHeaders(env) });
+        return json({ upstreamStatus: response.status, upstreamType: response.headers.get("Content-Type") });
+      } catch (error) {
+        return json({ fetchError: error instanceof Error ? error.message : "Error desconocido" });
+      }
+    }
     if (url.pathname === "/api/login" && request.method === "POST") return login(request, env);
     if (url.pathname === "/api/logout" && request.method === "POST") {
       if (!sameOrigin(request)) return json({ error: "Solicitud no permitida." }, 403);
