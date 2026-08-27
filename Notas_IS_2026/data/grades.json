@@ -318,6 +318,14 @@
       "name": "Laboratorio / tarea práctica 2",
       "grade": 100,
       "createdAt": "2026-08-27T01:19:44.874Z"
+    },
+    {
+      "id": "5729cc16-3dff-4585-8953-c80cc4a3a16b",
+      "courseId": "CI-0131",
+      "typeId": "collaborative-participation",
+      "name": "Asistencia y participación",
+      "grade": 100,
+      "createdAt": "2026-08-27T04:51:12.324Z"
     }
   ]
 }
