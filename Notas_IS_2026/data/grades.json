@@ -334,6 +334,14 @@
       "name": "Trabajo en clase 1",
       "grade": 100,
       "createdAt": "2026-09-01T23:04:52.460Z"
+    },
+    {
+      "id": "d414d9d9-46d8-4eab-92df-892f53d7f0a1",
+      "courseId": "CI-0120",
+      "typeId": "class-work",
+      "name": "Trabajo en clase 2",
+      "grade": 100,
+      "createdAt": "2026-09-01T23:04:58.414Z"
     }
   ]
 }
