@@ -342,6 +342,14 @@
       "name": "Trabajo en clase 2",
       "grade": 100,
       "createdAt": "2026-09-01T23:04:58.414Z"
+    },
+    {
+      "id": "1f3d9d0d-704c-477a-bbfd-ea127c07359d",
+      "courseId": "CI-0120",
+      "typeId": "short-test",
+      "name": "Prueba corta 1",
+      "grade": 40,
+      "createdAt": "2026-09-01T23:05:08.933Z"
     }
   ]
 }
